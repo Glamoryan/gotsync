@@ -1,0 +1,39 @@
+{{if .FileHeader}}{{.FileHeader}}
+
+{{end}}package {{.PackageName}}
+
+{{if .Imports}}
+import (
+{{range .Imports}}	{{.}}
+{{end}})
+
+{{end}}
+{{range .Types}}{{template "renderType" .}}
+
+{{end}}
+
+{{define "renderType"}}
+{{if eq .Kind "struct"}}{{template "renderStruct" .}}{{else if eq .Kind "enum"}}{{template "renderEnum" .}}{{else if eq .Kind "type"}}{{template "renderTypeAlias" .}}{{end}}
+{{end}}
+
+{{define "renderStruct"}}
+{{if .Description}}// {{.Description}}{{end}}
+type {{.Name}} struct {
+{{range .Properties}}	{{if .Description}}// {{.Description}}
+	{{end}}{{.Name}} {{if .Optional}}*{{end}}{{.Type}}{{if .Tags}} `{{.Tags}}`{{end}}
+{{end}}}
+{{end}}
+
+{{define "renderEnum"}}
+{{if .Description}}// {{.Description}}{{end}}
+type {{.Name}} {{.BaseType}}
+
+const (
+{{range $index, $value := .Values}}	{{$.Name}}{{$value.Name}} {{if eq $index 0}}{{$.Name}} = {{if $.IsIota}}iota{{else}}{{$value.Value}}{{end}}{{else}}{{if not $.IsIota}}{{$value.Value}}{{end}}{{end}}{{if $value.Deprecated}} // Deprecated{{end}}
+{{end}})
+{{end}}
+
+{{define "renderTypeAlias"}}
+{{if .Description}}// {{.Description}}{{end}}
+type {{.Name}} {{.Definition}}
+{{end}} 

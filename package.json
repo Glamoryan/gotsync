@@ -13,7 +13,9 @@
     "cli": "node packages/cli/dist/index.js"
   },
   "devDependencies": {
+    "@types/ejs": "^3.1.5",
     "@types/node": "^20.10.0",
+    "@types/swagger-parser": "^4.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
@@ -29,5 +31,10 @@
     "code-generation"
   ],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@apidevtools/swagger-parser": "^12.0.0",
+    "ejs": "^3.1.10",
+    "openapi-types": "^12.1.3"
+  }
 }

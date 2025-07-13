@@ -1,6 +1,11 @@
 import { Command } from 'commander';
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { readFileSync, existsSync, mkdirSync } from 'fs';
+import { join, resolve } from 'path';
+import { parseSchema } from '../../../../src/core/parser/parseSchema';
+import { mapSchemaCollection } from '../../../../src/core/utils/typeMapper';
+import { generateTypeScriptFromSchema } from '../../../../src/core/generator/ts';
+import { generateGoFromSchema } from '../../../../src/core/generator/go';
+import { SchemaCollection } from '../../../../src/core/types/OpenAPISchema';
 
 const generateCommand = new Command('generate');
 
@@ -12,7 +17,7 @@ generateCommand
   .option('--out <path>', 'output directory for generated files')
   .option('--go-only', 'generate only Go types')
   .option('--ts-only', 'generate only TypeScript types')
-  .action((options: { 
+  .action(async (options: { 
     config?: string; 
     schema?: string; 
     from?: string;
@@ -74,9 +79,106 @@ generateCommand
       console.log('🎯 Generating both Go and TypeScript types');
     }
 
-    // TODO: Connect to codegen packages
-    console.log('⚠️  Code generation will be implemented when codegen packages are connected.');
-    console.log('✅ Generation setup completed!');
+    // Start code generation pipeline
+    try {
+      // Step 1: Parse the schema
+      console.log('📖 Parsing OpenAPI schema...');
+      const schema = await parseSchema(schemaPath);
+      
+      // Step 2: Transform to intermediate types
+      console.log('🔄 Transforming to intermediate types...');
+      const schemas = schema.components?.schemas || {};
+      
+      // Filter out ReferenceObjects and keep only SchemaObjects
+      const schemaObjects: Record<string, any> = {};
+      for (const [name, schemaOrRef] of Object.entries(schemas)) {
+        if (!('$ref' in schemaOrRef)) {
+          schemaObjects[name] = schemaOrRef;
+        }
+      }
+      
+      const mappedTypes = mapSchemaCollection(schemaObjects);
+      
+      // Create proper SchemaCollection
+      const schemaCollection: SchemaCollection = {
+        types: mappedTypes,
+        rootTypes: Object.keys(mappedTypes),
+        metadata: {
+          title: schema.info?.title || 'Generated API',
+          version: schema.info?.version || '1.0.0',
+          description: schema.info?.description,
+          openApiVersion: schema.openapi || '3.0.0',
+          servers: schema.servers?.map(server => ({
+            url: server.url,
+            description: server.description,
+            variables: server.variables
+          })),
+          paths: [] // TODO: implement path mapping if needed
+        }
+      };
+      
+      // Step 3: Ensure output directory exists
+      const resolvedOutputDir = resolve(outputDir);
+      if (!existsSync(resolvedOutputDir)) {
+        mkdirSync(resolvedOutputDir, { recursive: true });
+      }
+      
+      // Step 4: Generate code based on flags
+      const promises: Promise<void>[] = [];
+      
+      if (!options.goOnly) {
+        // Generate TypeScript
+        console.log('🟦 Generating TypeScript types...');
+        promises.push(generateTypeScriptFromSchema(
+          schemaCollection,
+          resolvedOutputDir,
+          {
+            fileName: 'types.ts',
+            fileHeader: '// Auto-generated TypeScript types\n// Do not edit manually',
+            includeJsDoc: true,
+            useOptionalProperties: true,
+            exportTypes: true,
+          }
+        ));
+      }
+      
+      if (!options.tsOnly) {
+        // Generate Go
+        console.log('🟩 Generating Go types...');
+        promises.push(generateGoFromSchema(
+          schemaCollection,
+          resolvedOutputDir,
+          'types',
+          {
+            fileName: 'types.go',
+            fileHeader: '// Auto-generated Go types\n// Do not edit manually',
+            includeJsonTags: true,
+            includeValidationTags: false,
+            usePointersForOptional: true,
+            omitEmptyTags: true,
+          }
+        ));
+      }
+      
+      // Wait for all generations to complete
+      await Promise.all(promises);
+      
+      console.log('✅ Code generation completed successfully!');
+      console.log(`📁 Output directory: ${resolvedOutputDir}`);
+      
+      // List generated files
+      if (!options.goOnly) {
+        console.log('🟦 Generated TypeScript: types.ts');
+      }
+      if (!options.tsOnly) {
+        console.log('🟩 Generated Go: types.go');
+      }
+      
+    } catch (error) {
+      console.error('❌ Code generation failed:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'Unknown error');
+      process.exit(1);
+    }
   });
 
 

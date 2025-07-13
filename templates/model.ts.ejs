@@ -1,0 +1,91 @@
+<% if (fileHeader) { %>
+<%= fileHeader %>
+
+<% } %>
+<% if (imports && imports.length > 0) { %>
+<% imports.forEach(importStatement => { %>
+<%= importStatement %>
+<% }) %>
+
+<% } %>
+<% types.forEach(type => { %>
+<%= renderType(type) %>
+
+<% }) %>
+
+<%
+function renderType(type) {
+  if (type.kind === 'interface') {
+    return renderInterface(type);
+  } else if (type.kind === 'enum') {
+    return renderEnum(type);
+  } else if (type.kind === 'type') {
+    return renderTypeAlias(type);
+  }
+  return '';
+}
+
+function renderInterface(type) {
+  let result = '';
+  
+  // Add JSDoc comment
+  if (type.description) {
+    result += `/**\n * ${type.description}\n */\n`;
+  }
+  
+  // Interface declaration
+  result += `export interface ${type.name} {\n`;
+  
+  // Properties
+  type.properties.forEach(prop => {
+    if (prop.description) {
+      result += `  /**\n   * ${prop.description}\n   */\n`;
+    }
+    
+    const optional = prop.optional ? '?' : '';
+    const validation = prop.validation ? ` // ${prop.validation}` : '';
+    
+    result += `  ${prop.name}${optional}: ${prop.type};${validation}\n`;
+  });
+  
+  result += '}';
+  return result;
+}
+
+function renderEnum(type) {
+  let result = '';
+  
+  // Add JSDoc comment
+  if (type.description) {
+    result += `/**\n * ${type.description}\n */\n`;
+  }
+  
+  // Enum declaration
+  const enumType = type.isConst ? 'const enum' : 'enum';
+  result += `export ${enumType} ${type.name} {\n`;
+  
+  // Values
+  type.values.forEach(value => {
+    const deprecated = value.deprecated ? ' // @deprecated' : '';
+    const enumValue = typeof value.value === 'string' ? `'${value.value}'` : value.value;
+    
+    result += `  ${value.name} = ${enumValue},${deprecated}\n`;
+  });
+  
+  result += '}';
+  return result;
+}
+
+function renderTypeAlias(type) {
+  let result = '';
+  
+  // Add JSDoc comment
+  if (type.description) {
+    result += `/**\n * ${type.description}\n */\n`;
+  }
+  
+  // Type alias
+  result += `export type ${type.name} = ${type.definition};`;
+  return result;
+}
+%> 
