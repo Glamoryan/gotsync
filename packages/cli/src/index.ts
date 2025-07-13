@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { initCommand } from './commands/init';
 import { generateCommand } from './commands/generate';
+import { resetCommand } from './commands/reset';
 
 const program = new Command();
 
@@ -20,6 +21,7 @@ program
 // Add commands
 program.addCommand(initCommand);
 program.addCommand(generateCommand);
+program.addCommand(resetCommand);
 
 // Run the program
 program.parse(process.argv); 
