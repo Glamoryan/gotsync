@@ -1,6 +1,39 @@
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![npm version](https://img.shields.io/npm/v/gotsync.svg)](https://www.npmjs.com/package/gotsync)
+[![Build](https://img.shields.io/github/actions/workflow/status/Glamoryan/gotsync/ci.yml)](https://github.com/Glamoryan/gotsync/actions)
+
 # GotSync
 
-GotSync is an advanced code generation tool that automatically generates Go and TypeScript types from OpenAPI schemas.
+GotSync is a fullstack-friendly CLI tool that generates fully typed Go and TypeScript code from OpenAPI specs. It aims to bridge the gap between backend and frontend by enabling contract-first development, eliminating redundant code, and enforcing type safety across your stack.
+
+## ❓ Why GotSync?
+
+- 🔒 Avoid runtime errors by using shared, strongly typed definitions
+- ✨ No more copy-pasting API routes or manually writing client code
+- 🚀 Boost development speed with schema-driven code generation
+- 📦 Seamless monorepo support for scalable fullstack projects
+
+## 👥 Who is GotSync for?
+
+- Go + TypeScript fullstack developers
+- Backend teams using OpenAPI for contract-first APIs
+- Frontend developers tired of typing `any` or duplicating models
+
+## Generated Outputs
+
+```ts
+// TypeScript SDK (generated)
+export async function getUserById(id: string): Promise<User> {
+  return fetch(`/api/user/${id}`).then((res) => res.json());
+}
+```
+
+```go
+// Go Handler Stub (generated)
+func GetUserById(w http.ResponseWriter, r *http.Request) {
+  // TODO: Implement logic
+}
+```
 
 ## 📋 Table of Contents
 
