@@ -10,7 +10,19 @@
     "resolveJsonModule": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@core/*": ["./src/core/*"],
+      "@types/*": ["./src/core/types/*"],
+      "@parser/*": ["./src/core/parser/*"],
+      "@generator/*": ["./src/core/generator/*"],
+      "@utils/*": ["./src/core/utils/*"],
+      "@templates/*": ["./templates/*"],
+      "@tests/*": ["./src/__tests__/*"],
+      "@cli/*": ["./packages/cli/src/*"]
+    }
   },
   "references": [
     {

@@ -1,0 +1,172 @@
+openapi: 3.0.3
+info:
+  title: User Management API
+  description: API for managing user accounts and preferences
+  version: 2.0.0
+
+paths:
+  /users:
+    get:
+      summary: List users
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - username
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique user identifier
+          example: "123e4567-e89b-12d3-a456-426614174000"
+        username:
+          type: string
+          pattern: '^[a-zA-Z0-9_]{3,20}$'
+          description: Username
+          example: "john_doe"
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: "john@example.com"
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: "John"
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: "Doe"
+        phone:
+          type: string
+          pattern: '^\\+?[1-9]\\d{1,14}$'
+          example: "+1234567890"
+        userStatus:
+          type: integer
+          format: int32
+          description: User Status
+          enum: [1, 2, 3]
+          default: 1
+        isActive:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+          minItems: 1
+
+    UserPreferences:
+      type: object
+      properties:
+        theme:
+          type: string
+          enum: ["light", "dark", "auto"]
+          default: "auto"
+        language:
+          type: string
+          pattern: '^[a-z]{2}(-[A-Z]{2})?$'
+          default: "en"
+        notifications:
+          type: object
+          properties:
+            email:
+              type: boolean
+              default: true
+            push:
+              type: boolean
+              default: false
+            sms:
+              type: boolean
+              default: false
+          additionalProperties: false
+
+    Role:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          enum: ["admin", "user", "moderator"]
+        permissions:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+
+    CreateUserRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          pattern: '^[a-zA-Z0-9_]{3,20}$'
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+          minLength: 8
+          description: User password
+        firstName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        lastName:
+          type: string
+          minLength: 1
+          maxLength: 50
+        phone:
+          type: string
+          pattern: '^\\+?[1-9]\\d{1,14}$'
+        roles:
+          type: array
+          items:
+            type: string
+            enum: ["admin", "user", "moderator"]
+          minItems: 1
+          uniqueItems: true 

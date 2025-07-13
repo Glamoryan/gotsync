@@ -1,0 +1,127 @@
+openapi: 3.0.3
+info:
+  title: Learning API
+  description: A simple learning management API
+  version: 1.0.0
+  
+paths:
+  /courses:
+    get:
+      summary: Get all courses
+      description: Retrieve a list of all available courses
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Course'
+    post:
+      summary: Create a new course
+      description: Create a new course in the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseRequest'
+      responses:
+        '201':
+          description: Course created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Course'
+
+components:
+  schemas:
+    Course:
+      type: object
+      required:
+        - id
+        - title
+        - instructor
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the course
+          example: "course-123"
+        title:
+          type: string
+          description: Course title
+          minLength: 3
+          maxLength: 100
+          example: "Introduction to TypeScript"
+        instructor:
+          type: string
+          description: Course instructor name
+          example: "John Doe"
+        description:
+          type: string
+          description: Course description
+          example: "Learn the basics of TypeScript programming"
+        duration:
+          type: integer
+          description: Course duration in minutes
+          minimum: 30
+          maximum: 480
+          example: 120
+        isActive:
+          type: boolean
+          description: Whether the course is currently active
+          default: true
+        tags:
+          type: array
+          items:
+            type: string
+          description: Course tags
+          example: ["programming", "typescript", "beginner"]
+          uniqueItems: true
+          maxItems: 10
+        level:
+          type: string
+          enum: ["beginner", "intermediate", "advanced"]
+          description: Course difficulty level
+          default: "beginner"
+        
+    CreateCourseRequest:
+      type: object
+      required:
+        - title
+        - instructor
+      properties:
+        title:
+          type: string
+          description: Course title
+          minLength: 3
+          maxLength: 100
+          example: "Advanced JavaScript"
+        instructor:
+          type: string
+          description: Course instructor name
+          example: "Jane Smith"
+        description:
+          type: string
+          description: Course description
+          example: "Deep dive into advanced JavaScript concepts"
+        duration:
+          type: integer
+          description: Course duration in minutes
+          minimum: 30
+          maximum: 480
+          example: 180
+        tags:
+          type: array
+          items:
+            type: string
+          description: Course tags
+          example: ["programming", "javascript", "advanced"]
+          uniqueItems: true
+          maxItems: 10
+        level:
+          type: string
+          enum: ["beginner", "intermediate", "advanced"]
+          description: Course difficulty level
+          default: "beginner" 

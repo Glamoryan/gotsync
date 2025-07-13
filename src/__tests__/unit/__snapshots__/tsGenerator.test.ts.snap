@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TypeScript Generator > Snapshot Tests > should generate expected TypeScript for basic interface 1`] = `"// Generated interface code here"`;
+
+exports[`TypeScript Generator > Snapshot Tests > should generate expected TypeScript for complex types 1`] = `"// Generated complex types code here"`;
+
+exports[`TypeScript Generator > Snapshot Tests > should generate expected TypeScript for enum 1`] = `"// Generated enum code here"`;

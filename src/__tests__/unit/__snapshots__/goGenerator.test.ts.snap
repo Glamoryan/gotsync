@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Go Generator > Snapshot Tests > should generate expected Go code for basic struct 1`] = `"// Generated struct code here"`;
+
+exports[`Go Generator > Snapshot Tests > should generate expected Go code for complex types 1`] = `"// Generated complex types code here"`;
+
+exports[`Go Generator > Snapshot Tests > should generate expected Go code for enum 1`] = `"// Generated enum code here"`;
+
+exports[`Go Generator > Snapshot Tests > should generate expected Go code with validation tags 1`] = `"// Generated validation code here"`;
